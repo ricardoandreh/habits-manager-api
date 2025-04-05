@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.habits.habits_manager.user.enums.UserRole;
 import com.habits.habits_manager.task.model.Task;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,6 +44,14 @@ public class UserModel implements UserDetails {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    public UserModel(String firstName, String lastName, String email, String password, UserRole role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
 
     @PrePersist
     protected void onCreate() {
