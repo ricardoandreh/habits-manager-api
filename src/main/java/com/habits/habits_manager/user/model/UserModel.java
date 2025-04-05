@@ -2,9 +2,8 @@ package com.habits.habits_manager.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.habits.habits_manager.user.enums.UserRole;
-import com.habits.habits_manager.task.model.Task;
+import com.habits.habits_manager.task.model.TaskModel;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -66,7 +65,7 @@ public class UserModel implements UserDetails {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Task> tasks;
+    private List<TaskModel> taskModels;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
