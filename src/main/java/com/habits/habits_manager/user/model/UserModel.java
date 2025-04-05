@@ -2,8 +2,8 @@ package com.habits.habits_manager.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.habits.habits_manager.user.enums.UserRole;
+import com.habits.habits_manager.task.model.TaskModel;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -48,6 +48,15 @@ public class UserModel implements UserDetails {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TaskModel> taskModels;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
