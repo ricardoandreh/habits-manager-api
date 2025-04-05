@@ -1,13 +1,13 @@
 package com.habits.habits_manager.user.service;
 
 import com.habits.habits_manager.genericExceptions.DatabaseException;
+import com.habits.habits_manager.user.dtos.user.UserResponseDTO;
 import com.habits.habits_manager.user.exceptions.UserNotFoundException;
 import com.habits.habits_manager.user.model.UserModel;
 import com.habits.habits_manager.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -56,5 +56,21 @@ public class UserService {
         entity.setLastName(obj.getLastName());
         entity.setEmail(obj.getEmail());
         entity.setRole(obj.getRole());
+    }
+
+    public UserResponseDTO toUserDTO(UserModel user) {
+        return new UserResponseDTO(user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getRole());
+    }
+
+    public UserModel toUserModel(UserResponseDTO userDTO) {
+        return new UserModel(userDTO.firstname(),
+                userDTO.lastname(),
+                userDTO.email(),
+                userDTO.password(),
+                userDTO.Role());
     }
 }
