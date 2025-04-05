@@ -1,5 +1,6 @@
 package com.habits.habits_manager.infrastructure.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,12 +20,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfiguration implements WebMvcConfigurer {
 
-    @Autowired
     SecurityFilter securityFilter;
 
-    @Autowired
     CorsConfigurationSourceImpl corsConfigurationSource;
 
     @Bean
@@ -40,12 +40,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-    }
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000") .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") .allowedHeaders("*") .allowCredentials(true);
     }
 
     @Bean
