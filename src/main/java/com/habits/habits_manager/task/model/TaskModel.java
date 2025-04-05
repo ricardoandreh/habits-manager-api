@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Task implements Serializable {
+public class TaskModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -55,6 +55,19 @@ public class Task implements Serializable {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    public TaskModel(boolean completed, LocalDate localDate, String description, String title, String color, IconType icon, TaskType type, String location, LocalDateTime localDateTime, LocalDateTime localDateTime1) {
+        this.completed = completed;
+        this.description = description;
+        this.title = title;
+        this.dueDate = localDate;
+        this.color = color;
+        this.icon = icon;
+        this.type = type;
+        this.location = location;
+        this.createdAt = localDateTime;
+        this.updatedAt = localDateTime1;
+    }
 
     @PrePersist
     protected void onCreate() {

@@ -1,8 +1,11 @@
 package com.habits.habits_manager.task.controller;
 
-import com.habits.habits_manager.task.model.Task;
+import com.habits.habits_manager.task.dtos.TaskResponseDTO;
+import com.habits.habits_manager.task.model.TaskModel;
 import com.habits.habits_manager.task.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,21 +19,21 @@ public class TaskController {
     TaskService service;
 
     @GetMapping
-    public ResponseEntity<List<Task>> findAll() {
-        List<Task> list = service.findAll();
-        return ResponseEntity.ok().body(list);
+    @ResponseStatus(HttpStatus.OK)
+    public List<TaskResponseDTO> findAll() {
+        return service.findAll();
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Task> findById(@PathVariable String id) {
-        Task obj = service.findById(id);
-        return ResponseEntity.ok().body(obj);
+    @ResponseStatus(HttpStatus.OK)
+    public TaskResponseDTO findById(@PathVariable String id) {
+        return service.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Task> insert(@RequestBody Task obj) {
-        obj = service.insert(obj);
-        return ResponseEntity.ok().body(obj);
+    @ResponseStatus(HttpStatus.OK)
+    public TaskResponseDTO insert(@Valid @RequestBody TaskResponseDTO obj) {
+        return service.insert(obj);
     }
 
     @DeleteMapping(value = "/{id}")
@@ -40,9 +43,8 @@ public class TaskController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Task> update(@PathVariable String id, @RequestBody Task obj) {
+    public ResponseEntity<TaskModel> update(@PathVariable String id, @RequestBody TaskModel obj) {
         obj = service.update(id, obj);
         return ResponseEntity.ok().body(obj);
     }
-
 }

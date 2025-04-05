@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record TaskResponseDTO(
-        Long id,
         String title,
         String description,
         LocalDate dueDate,
