@@ -1,4 +1,4 @@
-package com.habits.habits_manager.user.dtos;
+package com.habits.habits_manager.user.dtos.jwt;
 
 import jakarta.validation.constraints.NotBlank;
 
