@@ -3,6 +3,7 @@ package com.habits.habits_manager.user.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.habits.habits_manager.user.enums.UserRole;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,12 +29,24 @@ public class UserModel implements UserDetails {
     private String password;
     private UserRole role;
 
-    public User(String login, String password, String email, String phone, UserRole role) {
-        this.login = login;
-        this.password = password;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    public UserModel(String firstName, String lastName, String email, String password, UserRole role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
-        this.phone = phone;
+        this.password = password;
         this.role = role;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @Override
