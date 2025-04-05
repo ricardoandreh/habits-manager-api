@@ -19,13 +19,13 @@ public class TokenService {
     public String generateAccessToken(UserModel user) {
         Instant expirationDate = this.generateAccessExpirationDate();
 
-        return this.generateToken(user.getUsername(), expirationDate);
+        return this.generateToken(user.getEmail(), expirationDate);
     }
 
     public String generateRefreshToken(UserModel user) {
         Instant expirationDate = this.generateRefreshExpirationDate();
 
-        return this.generateToken(user.getUsername(), expirationDate);
+        return this.generateToken(user.getEmail(), expirationDate);
     }
 
     public String generateToken(String username, Instant expirationDate) {
@@ -37,7 +37,7 @@ public class TokenService {
             Algorithm algorithm = Algorithm.HMAC256(this.secret);
 
             return JWT.create()
-                    .withIssuer("auth0")
+                    .withIssuer("auth-api")
                     .withSubject(username)
                     .withExpiresAt(expirationDate)
                     .sign(algorithm);
@@ -51,7 +51,7 @@ public class TokenService {
             Algorithm algorithm = Algorithm.HMAC256(this.secret);
 
             return JWT.require(algorithm)
-                    .withIssuer("auth0")
+                    .withIssuer("auth-api")
                     .build()
                     .verify(token)
                     .getSubject();
@@ -70,3 +70,4 @@ public class TokenService {
         return Instant.now().plusMillis(1000 * 60 * 60);
     }
 }
+
