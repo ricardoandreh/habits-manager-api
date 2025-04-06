@@ -1,45 +1,64 @@
 package com.habits.habits_manager.task.service;
 
 import com.habits.habits_manager.genericExceptions.DatabaseException;
+import com.habits.habits_manager.task.dtos.TaskRequestDTO;
 import com.habits.habits_manager.task.dtos.TaskResponseDTO;
 import com.habits.habits_manager.task.exceptions.TaskNotFoundException;
 import com.habits.habits_manager.task.model.TaskModel;
+import com.habits.habits_manager.user.model.UserModel;
 import com.habits.habits_manager.task.repository.TaskRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.BeanUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import com.habits.habits_manager.user.repository.UserRepository;
+import com.habits.habits_manager.task.dtos.TaskUpdateDTO;
+import com.habits.habits_manager.task.utils.Utils;
 
 @Service
+@RequiredArgsConstructor
 public class TaskService {
 
-    @Autowired
-    private TaskRepository repository;
-
+    final private TaskRepository taskRepository;
+    final private UserRepository userRepository;
+    
     public List<TaskResponseDTO> findAll() {
-        List<TaskModel> taskModels =repository.findAll();
+        List<TaskModel> taskModels = taskRepository.findAll();
         return taskModels.stream().map(this::toTaskResponseDTO).collect(Collectors.toList());
     }
 
-    public TaskResponseDTO findById(String id) {
-        Optional<TaskModel> obj = repository.findById(id);
+    public TaskResponseDTO findById(Long id) {
+        Optional<TaskModel> obj = taskRepository.findById(id);
         TaskModel taskModel = obj.orElseThrow(() -> new TaskNotFoundException(id));
         return toTaskResponseDTO(taskModel);
     }
 
-    public TaskResponseDTO insert(TaskResponseDTO obj) {
-        TaskModel taskModel = toTaskModel(obj);
-        repository.save(taskModel);
+    public TaskResponseDTO insert(TaskRequestDTO obj) {
+        TaskModel taskModel = new TaskModel();
+
+        BeanUtils.copyProperties(obj, taskModel);
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        
+        UserDetails user = this.userRepository.findByEmail(email);
+        
+        BeanUtils.copyProperties(obj, taskModel);
+
+        taskModel.setUser((UserModel) user);
+        
+        taskRepository.save(taskModel);
         return toTaskResponseDTO(taskModel);
     }
 
-    public void delete(String id) {
+    public void delete(Long id) {
         try {
-            if(repository.existsById(id)) {
-                repository.deleteById(id);
+            if(taskRepository.existsById(id)) {
+                taskRepository.deleteById(id);
             } else {
                 throw new TaskNotFoundException(id);
             }
@@ -48,24 +67,12 @@ public class TaskService {
         }
     }
 
-    public TaskModel update(String id, TaskModel obj) {
-        if (repository.existsById(id)) {
-            TaskModel entity = repository.getReferenceById(id);
-            updateData(entity, obj);
-            return repository.save(entity);
-        }
-        return null;
-    }
+    public TaskResponseDTO update(Long id, TaskUpdateDTO obj) {
+        TaskModel task = this.taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
 
-    public void updateData(TaskModel entity, TaskModel obj) {
-        entity.setTitle(obj.getTitle());
-        entity.setDescription(obj.getDescription());
-        entity.setDueDate(obj.getDueDate());
-        entity.setCompleted(obj.isCompleted());
-        entity.setType(obj.getType());
-        entity.setLocation(obj.getLocation());
-        entity.setCreatedAt(obj.getCreatedAt());
-        entity.setUpdatedAt(obj.getUpdatedAt());
+        Utils.copyNonNullProperties(obj, task);
+
+        return toTaskResponseDTO(taskRepository.save(task));
     }
 
     public TaskResponseDTO toTaskResponseDTO(TaskModel task) {
@@ -80,18 +87,5 @@ public class TaskService {
                 task.getLocation(),
                 task.getCreatedAt(),
                 task.getUpdatedAt());
-    }
-
-    public TaskModel toTaskModel(TaskResponseDTO taskDTO) {
-        return new TaskModel(taskDTO.completed(),
-                taskDTO.dueDate(),
-                taskDTO.description(),
-                taskDTO.title(),
-                taskDTO.color(),
-                taskDTO.icon(),
-                taskDTO.type(),
-                taskDTO.location(),
-                taskDTO.createdAt(),
-                taskDTO.updatedAt());
     }
 }
