@@ -1,0 +1,39 @@
+databases:
+  - name: habits-manager-db
+    plan: free
+    databaseName: habits_manager
+    user: habits_manager
+
+services:
+  - type: web
+    plan: free
+    name: habits-manager-api-devops
+    runtime: docker
+    dockerfilePath: Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JDK_JAVA_OPTIONS
+        value: -Xms256m -Xmx512m -Dspring.profiles.active=prod
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: habits-manager-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: habits-manager-db
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: habits-manager-db
+          property: database
+      - key: DATABASE_USER
+        fromDatabase:
+          name: habits-manager-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: habits-manager-db
+          property: password
+    numInstances: 1
