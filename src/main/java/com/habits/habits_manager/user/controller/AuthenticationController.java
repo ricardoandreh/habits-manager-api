@@ -24,15 +24,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthenticationController {
 
-    private AuthServiceImpl authService;
+    private final AuthServiceImpl authService;
 
-    private UserService userService;
+    private final UserService userService;
 
-    private UserRepository repository;
+    private final UserRepository repository;
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    private TokenService tokenService;
+    private final TokenService tokenService;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 

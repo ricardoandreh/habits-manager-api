@@ -5,17 +5,17 @@ import com.habits.habits_manager.user.dtos.user.UserResponseDTO;
 import com.habits.habits_manager.user.exceptions.UserNotFoundException;
 import com.habits.habits_manager.user.model.UserModel;
 import com.habits.habits_manager.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository repository;
+    private final UserRepository repository;
 
     public List<UserModel> findAll() {
         return repository.findAll();

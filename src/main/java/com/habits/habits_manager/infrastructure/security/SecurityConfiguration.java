@@ -23,9 +23,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class SecurityConfiguration implements WebMvcConfigurer {
 
-    SecurityFilter securityFilter;
+    final SecurityFilter securityFilter;
 
-    CorsConfigurationSourceImpl corsConfigurationSource;
+    final CorsConfigurationSourceImpl corsConfigurationSource;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
