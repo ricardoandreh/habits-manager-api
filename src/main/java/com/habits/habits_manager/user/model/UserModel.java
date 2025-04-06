@@ -44,6 +44,9 @@ public class UserModel implements UserDetails {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean isDarkMode;
+
     public UserModel(String firstName, String lastName, String email, String password, UserRole role) {
         this.firstName = firstName;
         this.lastName = lastName;
