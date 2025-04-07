@@ -9,9 +9,9 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Table(name = "tb_user")
 @Entity(name = "tb_user")
@@ -34,6 +34,8 @@ public class UserModel implements UserDetails {
     @Email
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
@@ -71,7 +73,7 @@ public class UserModel implements UserDetails {
 
     @Override
     public String getUsername() {
-        return login;
+        return email;
     }
 
     @Override
