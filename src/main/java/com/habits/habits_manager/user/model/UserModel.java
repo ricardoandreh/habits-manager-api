@@ -2,7 +2,9 @@ package com.habits.habits_manager.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.habits.habits_manager.user.enums.UserRole;
+import com.habits.habits_manager.task.model.TaskModel;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,23 +20,48 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class User implements UserDetails {
+public class UserModel implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-    private String login;
-    private String phone;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
+
+    @Email
+    @Column(nullable = false, unique = true)
     private String email;
     private String password;
+
+    @Column(nullable = false)
     private UserRole role;
 
-    public User(String login, String password, String email, String phone, UserRole role) {
-        this.login = login;
-        this.password = password;
-        this.email = email;
-        this.phone = phone;
-        this.role = role;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean isDarkMode;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TaskModel> taskModels;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
