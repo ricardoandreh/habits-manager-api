@@ -17,32 +17,33 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaskController {
 
-    final TaskService service;
+    final TaskService taskService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<TaskResponseDTO> findAll() {
 
-        return service.findAll();
+        return this.taskService.findAll();
     }
 
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public TaskResponseDTO findById(@PathVariable Long id) {
 
-        return service.findById(id);
+        return this.taskService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TaskResponseDTO insert(@RequestBody @Valid TaskRequestDTO obj) {
 
-        return service.insert(obj);
+        return this.taskService.insert(obj);
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        this.taskService.delete(id);
 
         return ResponseEntity.noContent().build();
     }
@@ -51,6 +52,6 @@ public class TaskController {
     @ResponseStatus(HttpStatus.OK)
     public TaskResponseDTO update(@PathVariable("id") Long id, @RequestBody TaskUpdateDTO obj) {
 
-        return service.update(id, obj);
+        return this.taskService.update(id, obj);
     }
 }

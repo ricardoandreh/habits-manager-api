@@ -63,4 +63,17 @@ public class TaskModel implements Serializable {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @Override
+    public String toString() {
+        return "TaskModel{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", dueDate=" + dueDate +
+                ", completed=" + completed +
+                ", type=" + type +
+                ", location='" + location + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }
