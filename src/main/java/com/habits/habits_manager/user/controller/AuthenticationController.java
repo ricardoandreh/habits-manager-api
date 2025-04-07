@@ -37,7 +37,7 @@ public class AuthenticationController {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid LoginRequestDTO data) {
+    public ResponseEntity<Object> login(@RequestBody @Valid LoginRequestDTO data) {
         UserModel user = (UserModel) repository.findByEmail(data.email());
 
         if (user == null) {
@@ -52,23 +52,22 @@ public class AuthenticationController {
         var auth = authenticationManager.authenticate(usernamePassword);
 
         var token = tokenService.generateAccessToken((UserModel) auth.getPrincipal());
+
         return ResponseEntity.ok(new AccessResponseDTO(token));
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody @Valid RegisterRequestDTO data) {
+    public ResponseEntity<String> register(@RequestBody @Valid RegisterRequestDTO data) {
         if (this.repository.findByEmail(data.email()) != null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Users already exists");
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
 
-        if (data.Role().name().equals(UserRole.USER.name())) {
-            UserModel user = new UserModel(data.firstname(), data.lastname(), data.email(), encryptedPassword, data.Role());
-            this.repository.save(user);
-            return ResponseEntity.ok().body("Usuário criado com sucesso!");
-        }
+        UserModel user = new UserModel(data.firstname(), data.lastname(), data.email(), encryptedPassword, UserRole.USER);
+        
+        this.repository.save(user);
 
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok().body("Usuário criado com sucesso!");
 
     }
 }

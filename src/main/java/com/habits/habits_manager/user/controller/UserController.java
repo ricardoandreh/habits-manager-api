@@ -1,47 +1,20 @@
 package com.habits.habits_manager.user.controller;
 
-import com.habits.habits_manager.user.model.UserModel;
 import com.habits.habits_manager.user.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import com.habits.habits_manager.user.dtos.user.UserResponseDTO;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    UserService service;
+    final UserService userService;
 
-    @GetMapping
-    public ResponseEntity<List<UserModel>> findAll() {
-        List<UserModel> list = service.findAll();
-        return ResponseEntity.ok().body(list);
-    }
+    @GetMapping(value = "/me")
+    public UserResponseDTO getProfile(@PathVariable("id") Long id) {
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<UserModel> findById(@PathVariable String id) {
-        UserModel obj = service.findById(id);
-        return ResponseEntity.ok().body(obj);
-    }
-
-    @PostMapping
-    public ResponseEntity<UserModel> insert(@RequestBody UserModel obj) {
-        obj = service.insert(obj);
-        return ResponseEntity.ok().body(obj);
-    }
-
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<UserModel> update(@PathVariable String id, @RequestBody UserModel obj) {
-        obj = service.update(id, obj);
-        return ResponseEntity.ok().body(obj);
+        return this.userService.findById(id); 
     }
 }
