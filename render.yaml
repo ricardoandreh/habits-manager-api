@@ -36,4 +36,10 @@ services:
         fromDatabase:
           name: habits-manager-db
           property: password
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_CHAT_MODEL
+        sync: false
+      - key: LLM_CHAT_TEMPERATURE
+        sync: false
     numInstances: 1
