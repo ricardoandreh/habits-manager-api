@@ -1,22 +1,24 @@
 package com.habits.habits_manager.user.controller;
 
+import java.util.Optional;
 import com.habits.habits_manager.user.dtos.jwt.AccessResponseDTO;
 import com.habits.habits_manager.user.dtos.user.LoginRequestDTO;
 import com.habits.habits_manager.user.dtos.user.RegisterRequestDTO;
 import com.habits.habits_manager.user.enums.UserRole;
 import com.habits.habits_manager.user.model.UserModel;
 import com.habits.habits_manager.user.repository.UserRepository;
-import com.habits.habits_manager.user.service.AuthServiceImpl;
 import com.habits.habits_manager.user.service.TokenService;
-import com.habits.habits_manager.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,11 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthenticationController {
 
-    private final AuthServiceImpl authService;
-
-    private final UserService userService;
-
-    private final UserRepository repository;
+    private final UserRepository userRepository;
 
     private final AuthenticationManager authenticationManager;
 
@@ -37,15 +35,13 @@ public class AuthenticationController {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody @Valid LoginRequestDTO data) {
-        UserModel user = (UserModel) repository.findByEmail(data.email());
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User doesn't exists");
-        }
+    @ResponseStatus(HttpStatus.OK)
+    public AccessResponseDTO login(@RequestBody @Valid LoginRequestDTO data) {
+        UserDetails user = this.userRepository.findByEmail(data.email())
+            .orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
 
         if (!passwordEncoder.matches(data.password(), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(user.getPassword() + data.password() + "Invalid login or password");
+            throw new RuntimeException("Invalid login or password");
         }
 
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
@@ -53,21 +49,26 @@ public class AuthenticationController {
 
         var token = tokenService.generateAccessToken((UserModel) auth.getPrincipal());
 
-        return ResponseEntity.ok(new AccessResponseDTO(token));
+        return new AccessResponseDTO(token);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody @Valid RegisterRequestDTO data) {
-        if (this.repository.findByEmail(data.email()) != null)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Users already exists");
+    @ResponseStatus(HttpStatus.CREATED)
+    public String register(@RequestBody @Valid RegisterRequestDTO data) {
+        this.userRepository.findByEmail(data.email()).ifPresent(user -> {
+            throw new RuntimeException("Usuário já existe");
+        });
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
 
-        UserModel user = new UserModel(data.firstname(), data.lastname(), data.email(), encryptedPassword, UserRole.USER);
+        UserModel user = new UserModel();
+
+        BeanUtils.copyProperties(data, user);
+        user.setPassword(encryptedPassword);
+        user.setRole(UserRole.USER);
         
-        this.repository.save(user);
+        this.userRepository.save(user);
 
-        return ResponseEntity.ok().body("Usuário criado com sucesso!");
-
+        return "Usuário criado com sucesso!";
     }
 }

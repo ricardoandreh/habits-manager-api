@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.habits.habits_manager.user.enums.UserRole;
 import com.habits.habits_manager.task.model.TaskModel;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,12 +22,21 @@ import java.util.List;
 @EqualsAndHashCode(of = "id")
 public class UserModel implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-    private String login;
-    private String phone;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
+
+    @Email
+    @Column(nullable = false, unique = true)
     private String email;
     private String password;
+
+    @Column(nullable = false)
     private UserRole role;
 
     @Column(nullable = false, updatable = false)
@@ -37,15 +47,7 @@ public class UserModel implements UserDetails {
 
     @Column(columnDefinition = "boolean default false")
     private boolean isDarkMode;
-
-    public UserModel(String firstName, String lastName, String email, String password, UserRole role) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
+    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

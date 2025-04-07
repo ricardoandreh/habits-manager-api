@@ -22,30 +22,35 @@ public class TaskController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<TaskResponseDTO> findAll() {
+
         return service.findAll();
     }
 
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public TaskResponseDTO findById(@PathVariable Long id) {
+
         return service.findById(id);
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
-    public TaskResponseDTO insert(@Valid @RequestBody TaskRequestDTO obj) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public TaskResponseDTO insert(@RequestBody @Valid TaskRequestDTO obj) {
+
         return service.insert(obj);
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
+
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public TaskResponseDTO update(@PathVariable("id") Long id, @RequestBody TaskUpdateDTO obj) {
+
         return service.update(id, obj);
     }
 }

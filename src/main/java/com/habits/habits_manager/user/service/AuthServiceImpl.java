@@ -1,27 +1,26 @@
 package com.habits.habits_manager.user.service;
 
-import com.habits.habits_manager.user.model.UserModel;
 import com.habits.habits_manager.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
+import java.util.Optional;
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements UserDetailsService {
-
-    @Autowired
-    private UserRepository repository;
+    
+    private final UserRepository repository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserModel user = (UserModel) repository.findByEmail(username);
+        Optional<UserDetails> user = repository.findByEmail(username);
 
-        if (user == null) {
+        if (user.isEmpty()) {
             throw new UsernameNotFoundException("User not found");
         }
 
-        return user;
+        return user.get();
     }
 }
