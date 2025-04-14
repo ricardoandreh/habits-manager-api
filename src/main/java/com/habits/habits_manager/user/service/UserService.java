@@ -5,6 +5,8 @@ import com.habits.habits_manager.user.exceptions.UserNotFoundException;
 import com.habits.habits_manager.user.model.UserModel;
 import com.habits.habits_manager.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,26 +15,18 @@ public class UserService {
 
     final private UserRepository userRepository;
 
-    public UserResponseDTO findById(Long id) {
-        UserModel user = this.userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException(id));
+    public UserResponseDTO findByEmail() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        
+        UserDetails user = this.userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        return this.toUserDTO(user);
+        return this.toUserDTO((UserModel) user);
     }
 
     public UserResponseDTO toUserDTO(UserModel user) {
         return new UserResponseDTO(user.getFirstName(),
                 user.getLastName(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getRole());
+                user.getEmail());
     }
-
-    // public UserModel toUserModel(UserResponseDTO userDTO) {
-    //     return new UserModel(userDTO.firstname(),
-    //             userDTO.lastname(),
-    //             userDTO.email(),
-    //             userDTO.password(),
-    //             userDTO.Role());
-    // }
 }

@@ -13,8 +13,8 @@ public class UserController {
     final UserService userService;
 
     @GetMapping(value = "/me")
-    public UserResponseDTO getProfile(@PathVariable("id") Long id) {
+    public UserResponseDTO getProfile() {
 
-        return this.userService.findById(id); 
+        return this.userService.findByEmail(); 
     }
 }
